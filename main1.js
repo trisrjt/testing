@@ -197,26 +197,54 @@ renderer.xr.addEventListener('sessionstart', () => {
 //   }
 // }
 // Function to handle model placement on "select" event
+// function onSelect() {
+//   if (reticle.visible) {
+//     const plantModel = scene.getObjectByName('plantModel');
+//     if (plantModel) {
+//       const modelClone = plantModel.clone();
+      
+//       // Place the model at the reticle's position
+//       modelClone.position.setFromMatrixPosition(reticle.matrix);
+      
+//       // Ensure the model's base is at or just above the ground plane (y = 0)
+//       const box = new THREE.Box3().setFromObject(modelClone);
+//       const height = box.max.y - box.min.y;
+
+//       // Adjust the y position to keep the model just above the ground plane
+//       modelClone.position.y = modelClone.position.y - (box.min.y + 0.01);  // Minimal gap
+
+//       scene.add(modelClone);
+
+//       const plantInfo = "This is a medicinal plant used for...";
+//       alert(plantInfo);  // Use a better UI instead of alert
+//     }
+//   }
+// }
 function onSelect() {
   if (reticle.visible) {
     const plantModel = scene.getObjectByName('plantModel');
     if (plantModel) {
       const modelClone = plantModel.clone();
-      
-      // Place the model at the reticle's position
-      modelClone.position.setFromMatrixPosition(reticle.matrix);
-      
-      // Ensure the model's base is at or just above the ground plane (y = 0)
-      const box = new THREE.Box3().setFromObject(modelClone);
-      const height = box.max.y - box.min.y;
 
-      // Adjust the y position to keep the model just above the ground plane
-      modelClone.position.y = modelClone.position.y - (box.min.y + 0.01);  // Minimal gap
+      // Set model position from the reticle matrix
+      modelClone.position.setFromMatrixPosition(reticle.matrix);
+
+      // Ensure the model is not floating (set the y-position to 0)
+      const box = new THREE.Box3().setFromObject(modelClone);
+      const modelHeight = box.max.y - box.min.y;
+
+      // Adjust y position to place it on the ground level
+      modelClone.position.y = modelClone.position.y - box.min.y;
+
+      // Adjust the scale of the model to fit within the view (optional)
+      const scaleFactor = 0.5;  // Adjust this based on the current model size
+      modelClone.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
       scene.add(modelClone);
 
+      // Display plant info as needed (custom UI instead of alert)
       const plantInfo = "This is a medicinal plant used for...";
-      alert(plantInfo);  // Use a better UI instead of alert
+      alert(plantInfo);  // Replace with a better UI
     }
   }
 }
@@ -229,6 +257,16 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+// Update model position in front of the camera without tilting
+function placeModelInFrontOfCamera(modelClone) {
+  const distanceFromCamera = 1;  // Adjust distance
+  const cameraDirection = new THREE.Vector3();
+  camera.getWorldDirection(cameraDirection);
+  
+  // Position the model directly in front of the camera at a specific distance
+  modelClone.position.copy(camera.position).add(cameraDirection.multiplyScalar(distanceFromCamera));
+}
+
 
 // Animate function to render the scene and update hit testing for AR
 function animate() {
@@ -252,5 +290,6 @@ function animate() {
     renderer.render(scene, camera);
   });
 }
+
 
 animate();
