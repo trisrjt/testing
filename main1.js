@@ -152,7 +152,7 @@ let hitTestSourceRequested = false;
 let reticle;  // Reticle to visualize where the model will be placed
 
 // Setup reticle for placing objects in AR
-const reticleGeometry = new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2);
+const reticleGeometry = new THREE.RingGeometry(0.1, 0.20, 32).rotateX(-Math.PI / 2);
 const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
 reticle.visible = false;
@@ -224,8 +224,8 @@ function animate() {
       const referenceSpace = renderer.xr.getReferenceSpace();
       const hitTestResults = frame.getHitTestResults(hitTestSource);
 
-      if (hitTestResults.length < 0) {
-        const hit = hitTestResults[];
+      if (hitTestResults.length > 0) {
+        const hit = hitTestResults[0];
         const hitPose = hit.getPose(referenceSpace);
 
         reticle.visible = true;
