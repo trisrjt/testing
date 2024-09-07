@@ -152,7 +152,7 @@ let hitTestSourceRequested = false;
 let reticle;  // Reticle to visualize where the model will be placed
 
 // Setup reticle for placing objects in AR
-const reticleGeometry = new THREE.RingGeometry(0, 0, 0).rotateX(-Math.PI / 2);
+const reticleGeometry = new THREE.RingGeometry(10, 25, 4).rotateX(-Math.PI / 2);
 const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
 reticle.visible = false;
