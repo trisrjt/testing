@@ -119,7 +119,7 @@ scene.add(spotLight);
 
 // Load 3D model (e.g., a plant)
 const loader = new GLTFLoader();
-loader.load('./Grass.glb', (gltf) => {
+loader.load('./plant1.glb', (gltf) => {
   const model = gltf.scene;
   model.name = 'plantModel';  // Correctly name the model
 
