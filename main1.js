@@ -224,8 +224,8 @@ function animate() {
       const referenceSpace = renderer.xr.getReferenceSpace();
       const hitTestResults = frame.getHitTestResults(hitTestSource);
 
-      if (hitTestResults.length > 0) {
-        const hit = hitTestResults[0];
+      if (hitTestResults.length < 0) {
+        const hit = hitTestResults[];
         const hitPose = hit.getPose(referenceSpace);
 
         reticle.visible = true;
