@@ -24,6 +24,9 @@ const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerH
 camera.position.set(4, 5, 10);
 scene.add(camera);
 
+camera.fov = 60;  // Lower FOV to make the scene appear larger
+camera.updateProjectionMatrix();
+
 // Add text geometry above the plant
 const fontLoader = new FontLoader();
 fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
@@ -121,7 +124,7 @@ scene.add(spotLight);
 const loader = new GLTFLoader();
 loader.load('./plant2.glb', (gltf) => {
   const model = gltf.scene;
-  model.name = 'plantModel';  // Correctly name the model
+  model.name = 'plantModel';
 
   model.traverse((child) => {
     if (child.isMesh) {
@@ -130,10 +133,14 @@ loader.load('./plant2.glb', (gltf) => {
     }
   });
 
+  // Scale the model down (e.g., 0.2 times its original size)
+  model.scale.set(0.2, 0.2, 0.2);
+
+  // Adjust its position if necessary
   model.position.set(0, 1.05, -1);
   scene.add(model);
 
-  const progressContainer = document.getElementById('progress-container');  // Make sure this element exists in HTML
+  const progressContainer = document.getElementById('progress-container');
   if (progressContainer) {
     progressContainer.style.display = 'none';
   }
@@ -142,6 +149,7 @@ loader.load('./plant2.glb', (gltf) => {
 }, (error) => {
   console.error(error);
 });
+
 
 // ARButton for entering AR mode
 document.body.appendChild(ARButton.createButton(renderer));
@@ -152,7 +160,7 @@ let hitTestSourceRequested = false;
 let reticle;  // Reticle to visualize where the model will be placed
 
 // Setup reticle for placing objects in AR
-const reticleGeometry = new THREE.RingGeometry(10, 25, 4).rotateX(-Math.PI / 2);
+const reticleGeometry = new THREE.RingGeometry(0.1, 0.15, 32).rotateX(-Math.PI / 2);
 const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
 reticle.visible = false;
