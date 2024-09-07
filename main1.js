@@ -24,7 +24,7 @@ const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerH
 camera.position.set(4, 5, 10);
 scene.add(camera);
 
-camera.fov = 60;  // Lower FOV to make the scene appear larger
+camera.fov = 90;  // Lower FOV to make the scene appear larger
 camera.updateProjectionMatrix();
 
 // Add text geometry above the plant
