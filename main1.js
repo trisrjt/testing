@@ -24,9 +24,6 @@ const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerH
 camera.position.set(4, 5, 10);
 scene.add(camera);
 
-camera.fov = 90;  // Lower FOV to make the scene appear larger
-camera.updateProjectionMatrix();
-
 // Add text geometry above the plant
 const fontLoader = new FontLoader();
 fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
@@ -48,15 +45,15 @@ fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.
       bevelEnabled: false
     });
 
-//     const textMaterial = new THREE.MeshBasicMaterial({ color: 0xdae64e   });
-//     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xdae64e   });
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
 
-//     // Position each line; adjust Y position by `lineHeight` to prevent overlap
-//     textMesh.position.set(2, 1 - (index * lineHeight), 2);  // Y position decreases for each line
+    // Position each line; adjust Y position by `lineHeight` to prevent overlap
+    textMesh.position.set(2, 1 - (index * lineHeight), 2);  // Y position decreases for each line
 
-//     scene.add(textMesh);
-//   });
-// });
+    scene.add(textMesh);
+  });
+});
 
 
 // const fontLoader = new FontLoader();
@@ -122,9 +119,9 @@ scene.add(spotLight);
 
 // Load 3D model (e.g., a plant)
 const loader = new GLTFLoader();
-loader.load('./plant2.glb', (gltf) => {
+loader.load('./Grass.glb', (gltf) => {
   const model = gltf.scene;
-  model.name = 'plantModel';
+  model.name = 'plantModel';  // Correctly name the model
 
   model.traverse((child) => {
     if (child.isMesh) {
@@ -133,14 +130,10 @@ loader.load('./plant2.glb', (gltf) => {
     }
   });
 
-  // Scale the model down (e.g., 0.2 times its original size)
-  model.scale.set(0.2, 0.2, 0.2);
-
-  // Adjust its position if necessary
   model.position.set(0, 1.05, -1);
   scene.add(model);
 
-  const progressContainer = document.getElementById('progress-container');
+  const progressContainer = document.getElementById('progress-container');  // Make sure this element exists in HTML
   if (progressContainer) {
     progressContainer.style.display = 'none';
   }
@@ -149,7 +142,6 @@ loader.load('./plant2.glb', (gltf) => {
 }, (error) => {
   console.error(error);
 });
-
 
 // ARButton for entering AR mode
 document.body.appendChild(ARButton.createButton(renderer));
@@ -160,12 +152,11 @@ let hitTestSourceRequested = false;
 let reticle;  // Reticle to visualize where the model will be placed
 
 // Setup reticle for placing objects in AR
-const reticleGeometry = new THREE.RingGeometry(0.05, 0.1, 15).rotateX(-Math.PI / 2);  // Smaller reticle
+const reticleGeometry = new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2);
 const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
 reticle.visible = false;
 scene.add(reticle);
-
 
 // Handle session for AR hit testing
 renderer.xr.addEventListener('sessionstart', () => {
@@ -197,58 +188,26 @@ renderer.xr.addEventListener('sessionstart', () => {
 //   }
 // }
 // Function to handle model placement on "select" event
-// function onSelect() {
-//   if (reticle.visible) {
-//     const plantModel = scene.getObjectByName('plantModel');
-//     if (plantModel) {
-//       const modelClone = plantModel.clone();
-      
-//       // Place the model at the reticle's position
-//       modelClone.position.setFromMatrixPosition(reticle.matrix);
-      
-//       // Ensure the model's base is at or just above the ground plane (y = 0)
-//       const box = new THREE.Box3().setFromObject(modelClone);
-//       const height = box.max.y - box.min.y;
-
-//       // Adjust the y position to keep the model just above the ground plane
-//       modelClone.position.y = modelClone.position.y - (box.min.y + 0.01);  // Minimal gap
-
-//       scene.add(modelClone);
-
-//       const plantInfo = "This is a medicinal plant used for...";
-//       alert(plantInfo);  // Use a better UI instead of alert
-//     }
-//   }
-// }
 function onSelect() {
   if (reticle.visible) {
+    // Clone or move the 3D model to the reticle's position
     const plantModel = scene.getObjectByName('plantModel');
     if (plantModel) {
       const modelClone = plantModel.clone();
-
-      // Set model position from the reticle matrix
+      
+      // Place the model at the reticle's position
       modelClone.position.setFromMatrixPosition(reticle.matrix);
-
-      // Ensure the model is not floating (set the y-position to 0)
-      const box = new THREE.Box3().setFromObject(modelClone);
-      const modelHeight = box.max.y - box.min.y;
-
-      // Adjust y position to place it on the ground level
-      modelClone.position.y = modelClone.position.y - box.min.y;
-
-      // Adjust the scale of the model to fit within the view (optional)
-      const scaleFactor = 0.5;  // Adjust this based on the current model size
-      modelClone.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
+      
+      // Adjust Y-position to ground level if needed (e.g., if model is floating)
+      modelClone.position.y = 0;  // Ensure it's at ground level
+      
       scene.add(modelClone);
-
-      // Display plant info as needed (custom UI instead of alert)
+      
       const plantInfo = "This is a medicinal plant used for...";
-      alert(plantInfo);  // Replace with a better UI
+      alert(plantInfo);  // Use a modal or a custom UI instead of alert
     }
   }
 }
-
 
 
 // Handle resizing of the window
@@ -257,16 +216,6 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
-// Update model position in front of the camera without tilting
-function placeModelInFrontOfCamera(modelClone) {
-  const distanceFromCamera = 1;  // Adjust distance
-  const cameraDirection = new THREE.Vector3();
-  camera.getWorldDirection(cameraDirection);
-  
-  // Position the model directly in front of the camera at a specific distance
-  modelClone.position.copy(camera.position).add(cameraDirection.multiplyScalar(distanceFromCamera));
-}
-
 
 // Animate function to render the scene and update hit testing for AR
 function animate() {
@@ -290,6 +239,5 @@ function animate() {
     renderer.render(scene, camera);
   });
 }
-
 
 animate();
