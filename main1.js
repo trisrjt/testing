@@ -48,15 +48,15 @@ fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.
       bevelEnabled: false
     });
 
-    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xdae64e   });
-    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+//     const textMaterial = new THREE.MeshBasicMaterial({ color: 0xdae64e   });
+//     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
 
-    // Position each line; adjust Y position by `lineHeight` to prevent overlap
-    textMesh.position.set(2, 1 - (index * lineHeight), 2);  // Y position decreases for each line
+//     // Position each line; adjust Y position by `lineHeight` to prevent overlap
+//     textMesh.position.set(2, 1 - (index * lineHeight), 2);  // Y position decreases for each line
 
-    scene.add(textMesh);
-  });
-});
+//     scene.add(textMesh);
+//   });
+// });
 
 
 // const fontLoader = new FontLoader();
