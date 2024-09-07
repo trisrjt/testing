@@ -160,11 +160,12 @@ let hitTestSourceRequested = false;
 let reticle;  // Reticle to visualize where the model will be placed
 
 // Setup reticle for placing objects in AR
-const reticleGeometry = new THREE.RingGeometry(0.1, 0.15, 32).rotateX(-Math.PI / 2);
+const reticleGeometry = new THREE.RingGeometry(0.05, 0.1, 32).rotateX(-Math.PI / 2);  // Smaller reticle
 const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
 reticle.visible = false;
 scene.add(reticle);
+
 
 // Handle session for AR hit testing
 renderer.xr.addEventListener('sessionstart', () => {
@@ -198,7 +199,6 @@ renderer.xr.addEventListener('sessionstart', () => {
 // Function to handle model placement on "select" event
 function onSelect() {
   if (reticle.visible) {
-    // Clone or move the 3D model to the reticle's position
     const plantModel = scene.getObjectByName('plantModel');
     if (plantModel) {
       const modelClone = plantModel.clone();
@@ -206,16 +206,21 @@ function onSelect() {
       // Place the model at the reticle's position
       modelClone.position.setFromMatrixPosition(reticle.matrix);
       
-      // Adjust Y-position to ground level if needed (e.g., if model is floating)
-      modelClone.position.y = 0;  // Ensure it's at ground level
-      
+      // Ensure the model's base is at or just above the ground plane (y = 0)
+      const box = new THREE.Box3().setFromObject(modelClone);
+      const height = box.max.y - box.min.y;
+
+      // Adjust the y position to keep the model just above the ground plane
+      modelClone.position.y = modelClone.position.y - (box.min.y + 0.01);  // Minimal gap
+
       scene.add(modelClone);
-      
+
       const plantInfo = "This is a medicinal plant used for...";
-      alert(plantInfo);  // Use a modal or a custom UI instead of alert
+      alert(plantInfo);  // Use a better UI instead of alert
     }
   }
 }
+
 
 
 // Handle resizing of the window
