@@ -20,8 +20,8 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 // Initialize camera
-const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 1, 1000);
-camera.position.set(4, 5, 10);
+const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 100);
+camera.position.set(5, 10, 10);
 scene.add(camera);
 
 // Add text geometry above the plant
@@ -93,7 +93,7 @@ renderer.xr.addEventListener('sessionend', () => {
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = false;
-controls.minDistance = 5;
+controls.minDistance = 4;
 controls.maxDistance = 20;
 controls.minPolarAngle = 0.5;
 controls.maxPolarAngle = 1.5;
@@ -102,7 +102,7 @@ controls.target = new THREE.Vector3(0, 1, 0);
 controls.update();
 
 // Create ground mesh
-const groundGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
+const groundGeometry = new THREE.PlaneGeometry(20, 20, 30, 30);
 groundGeometry.rotateX(-Math.PI / 2);
 const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x46664e , side: THREE.DoubleSide });
 const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
@@ -111,15 +111,60 @@ groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
 // Add light to the scene
-const spotLight = new THREE.SpotLight(0xffffff, 3000, 100, 0.22, 1);
-spotLight.position.set(5, 40, 40);
-spotLight.castShadow = true;
-spotLight.shadow.bias = -0.000;
-scene.add(spotLight);
+// const spotLight = new THREE.SpotLight(0xffffff, 9500, 100, 0.22, 1);
+// spotLight.position.set(5, 40, 40);
+// spotLight.castShadow = true;
+// spotLight.shadow.bias = 0.00;
+// scene.add(spotLight);
+// Add multiple spotlights for 360-degree effect
+const spotLight1 = new THREE.SpotLight(0xffffff, 18, 10000, Math.PI / 6, 0.5, 1);
+spotLight1.position.set(15, 10, 0);
+spotLight1.castShadow = true;
+scene.add(spotLight1);
+
+const spotLight2 = new THREE.SpotLight(0xffffff, 18, 10000, Math.PI / 6, 0.5, 1);
+spotLight2.position.set(-15, 10, 0);
+spotLight2.castShadow = true;
+scene.add(spotLight2);
+
+const spotLight3 = new THREE.SpotLight(0xffffff, 18, 10000, Math.PI / 6, 0.5, 1);
+spotLight3.position.set(0, 10, 15);
+spotLight3.castShadow = true;
+scene.add(spotLight3);
+
+const spotLight4 = new THREE.SpotLight(0xffffff, 18, 10000, Math.PI / 6, 0.5, 1);
+spotLight4.position.set(0, 10, -15);
+spotLight4.castShadow = true;
+scene.add(spotLight4);
+
+const spotLight5 = new THREE.SpotLight(0xffffff, 18, 10000, Math.PI / 6, 0.5, 1);
+spotLight5.position.set(0, 20, 1);
+spotLight5.castShadow = false;
+scene.add(spotLight5);
+
+// Optionally add spotlight helpers to visualize lights
+// const spotLightHelper1 = new THREE.SpotLightHelper(spotLight1);
+// scene.add(spotLightHelper1);
+
+// const spotLightHelper2 = new THREE.SpotLightHelper(spotLight2);
+// scene.add(spotLightHelper2);
+
+// const spotLightHelper3 = new THREE.SpotLightHelper(spotLight3);
+// scene.add(spotLightHelper3);
+
+// const spotLightHelper4 = new THREE.SpotLightHelper(spotLight4);
+// scene.add(spotLightHelper4);
+
+// const spotLightHelper5 = new THREE.SpotLightHelper(spotLight5);
+// scene.add(spotLightHelper5);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.50); // Lower intensity for soft fill light
+scene.add(ambientLight);
+
 
 // Load 3D model (e.g., a plant)
 const loader = new GLTFLoader();
-loader.load('./plant2.glb', (gltf) => {
+loader.load('./bel1.glb', (gltf) => {
   const model = gltf.scene;
   model.name = 'plantModel';  // Correctly name the model
 
@@ -130,7 +175,7 @@ loader.load('./plant2.glb', (gltf) => {
     }
   });
 
-  model.position.set(-1, 1.05, -1);
+  model.position.set(0, 0.001, -0.1);
   scene.add(model);
 
   const progressContainer = document.getElementById('progress-container');  // Make sure this element exists in HTML
@@ -152,7 +197,7 @@ let hitTestSourceRequested = false;
 let reticle;  // Reticle to visualize where the model will be placed
 
 // Setup reticle for placing objects in AR
-const reticleGeometry = new THREE.RingGeometry(0.1, 0.20, 32).rotateX(-Math.PI / 2);
+const reticleGeometry = new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2);
 const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
 reticle.visible = false;
