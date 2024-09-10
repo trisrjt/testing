@@ -235,24 +235,33 @@ renderer.xr.addEventListener('sessionstart', () => {
 // Function to handle model placement on "select" event
 function onSelect() {
   if (reticle.visible) {
-    // Clone or move the 3D model to the reticle's position
+    // Get the 3D plant model
     const plantModel = scene.getObjectByName('plantModel');
+    
     if (plantModel) {
+      // Clone the model
       const modelClone = plantModel.clone();
       
-      // Place the model at the reticle's position
+      // Place the cloned model at the reticle's position
       modelClone.position.setFromMatrixPosition(reticle.matrix);
       
-      // Adjust Y-position to ground level if needed (e.g., if model is floating)
-      modelClone.position.y = 0;  // Ensure it's at ground level
+      // Adjust the Y-position to make sure the model is placed at ground level
+      // This ensures the model is not floating above the ground
+      modelClone.position.y = 0;  // Set the Y-coordinate to ground level
       
+      // Adjust the scale of the model to fit the real-world size (if needed)
+      modelClone.scale.set(0.5, 0.5, 0.5);  // Example: scaling down by half
+
+      // Add the cloned model to the scene
       scene.add(modelClone);
       
-      const plantInfo = "This is a medicinal plant used for...";
-      alert(plantInfo);  // Use a modal or a custom UI instead of alert
+      // Provide additional plant information
+      const plantInfo = "This is a medicinal plant used for various purposes...";
+      alert(plantInfo);  // Replace this with a more sophisticated UI if needed
     }
   }
 }
+
 
 
 // Handle resizing of the window
